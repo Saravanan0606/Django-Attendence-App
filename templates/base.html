@@ -36,47 +36,6 @@
     <!-- Include jQuery and your other JavaScript code -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- <script>
-    $(document).ready(function() {
-        // When the attendanceButton is clicked
-        $("#attendanceButton").on("click", function() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const { latitude, longitude } = position.coords;
-                    console.log("Latitude:", latitude);
-                    console.log("Longitude:", longitude);
-
-                    // Send geolocation to Django backend via AJAX
-                    $.ajax({
-                        type: "POST",
-                        url: "{% url 'record_attendance' %}", // Replace with your Django endpoint URL
-                        data: { latitude, longitude },
-                        headers: {
-                            'X-CSRFToken': window.csrf_token // Access the CSRF token from the global variable
-                        },
-                        success: function(response) {
-                            // Handle success response from the backend
-                            console.log(response);
-                            alert("Attendance recorded successfully!");
-                        },
-                        error: function(error) {
-                            // Handle error response from the backend
-                            console.error(error);
-                            alert("Error recording attendance. Please try again.");
-                        }
-                    });
-                }, function(error) {
-                    // Error callback for geolocation getCurrentPosition
-                    console.error("Error getting position:", error);
-                    alert("Error getting your location. Please ensure location services are enabled.");
-                });
-            } else {
-                console.log("Geolocation is not supported by this browser.");
-                alert("Geolocation is not supported by this browser.");
-            }
-        });
-    });
-</script> -->
 <script>
     $(document).ready(function() {
         // Function to calculate the distance between two points (in kilometers)
@@ -172,7 +131,6 @@
                                 alert("Error recording attendance. Please try again.");
                             }
                         });
-                        alert("You are not within the permitted perimeter to mark attendance.");
                     }
 
                 }, function(error) {

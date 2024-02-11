@@ -1,3 +1,5 @@
+from django.utils import timezone
+from datetime import date
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages, auth
@@ -55,6 +57,14 @@ def record_attendance(request):
         within_perimeter = request.POST.get('withinPerimeter')  # Get the withinPerimeter status from the POST data
         print(latitude, longitude)
 
+        current_date = timezone.now().date()
+
+        # Check if an attendance record already exists for the current user on the current date
+        existing_attendance = Attendance.objects.filter(user=request.user, created_at__date=current_date).first()
+
+        if existing_attendance:
+            return JsonResponse({"error": "Attendance already recorded for today."})
+
         if within_perimeter == 'true':  # Check if withinPerimeter is 'true' (string)
             # Record attendance if the user is within the permitted perimeter
             attendance_present = Attendance.objects.create(user=request.user, latitude=latitude, longitude=longitude, is_present=True)
@@ -64,7 +74,7 @@ def record_attendance(request):
             attendance_absent = Attendance.objects.create(user=request.user, latitude=latitude, longitude=longitude, is_present=False)
             attendance_absent.save()
             # Do something else (e.g., display a message, log the event) if the user is not within the permitted perimeter
-            return JsonResponse({"error": "User is not within the attendence perimeter."})  
+            return JsonResponse({"error": "You are not within the permitted perimeter to mark attendance."})  
     else:
         return JsonResponse({"error": "Error: POST request required."})  
 
