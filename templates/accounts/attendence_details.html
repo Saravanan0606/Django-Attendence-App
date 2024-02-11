@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-lg-5" style="background-color: #3f3f3f;">
+    <table id="attendanceTable" class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col">Status</th>
+                <th scope="col">Attendance Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attendance in attendences %}
+            <tr>
+                <td>{{ emp_num }}</td>
+                {% if attendance.is_present %}
+                    <td style="font-style: italic; color: green;"><b>Present</b></td>
+                {% else %}
+                    <td style="font-style: italic; color: red;"><b>Absent</b></td>
+                {% endif %}
+                <td>{{ attendance.created_at }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>   
+</div>
+
+{% endblock %}

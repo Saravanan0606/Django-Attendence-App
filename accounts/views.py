@@ -6,7 +6,6 @@ from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from django.core.serializers import serialize
 import requests
-from geopy.distance import geodesic
 
 from accounts.models import Attendance, UserProfile
 
@@ -79,12 +78,17 @@ def record_attendance(request):
         return JsonResponse({"error": "Error: POST request required."})  
 
 @login_required(login_url='login')
-def view_attendance(request):
-    # Fetch attendance data for the logged-in user
-    attendances = Attendance.objects.filter(user=request.user)
-    data = serialize('json', attendances)
-
-    return JsonResponse(data, safe=False)
+def view_attendence(request):
+    # Retrieve attendance records from the database
+    attendences = Attendance.objects.filter(user=request.user)
+    user_details = UserProfile.objects.get(user=request.user)
+    emp_num = user_details.emp_num
+    context = {
+        'attendences': attendences,
+        'emp_num': emp_num,
+    }
+    
+    return render(request, 'accounts/attendence_details.html', context)
 
 @login_required(login_url = 'login')
 def logout(request):

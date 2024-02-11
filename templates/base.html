@@ -21,7 +21,7 @@
         }
     </style>
 </head>
-<body>
+<body style="background-color: #3f3f3f;">
 
     {% include 'navbar.html' %}
 
@@ -60,21 +60,21 @@
         
         //ksr college locations
 
-        // const locations = [
-        //             { latitude: 11.35675, longitude: 77.832722 }, 
-        //             { latitude: 11.354746, longitude: 77.826714 }, 
-        //             { latitude: 11.359947, longitude: 77.823719 },
-        //             { latitude: 11.363630, longitude: 77.826814 }
-        //         ];
+        const locations = [
+                    { latitude: 11.35675, longitude: 77.832722 }, 
+                    { latitude: 11.354746, longitude: 77.826714 }, 
+                    { latitude: 11.359947, longitude: 77.823719 },
+                    { latitude: 11.363630, longitude: 77.826814 }
+                ];
 
         // test locations
 
-        const locations = [
-                    { latitude: 12.712934, longitude: 79.532848 }, 
-                    { latitude: 12.711604, longitude: 79.531850 }, 
-                    { latitude: 12.712012, longitude: 79.530359 },
-                    { latitude: 12.713237, longitude: 79.530488 } 
-                ];
+        // const locations = [
+        //     { latitude: 12.662671, longitude: 79.968669 }, 
+        //     { latitude: 12.660264, longitude: 79.967667 }, 
+        //     { latitude: 12.661518, longitude: 79.964981 },
+        //     { latitude: 12.663624, longitude: 79.966176 } 
+        // ];
 
         // When the attendanceButton is clicked
         $("#attendanceButton").on("click", function() {
@@ -144,42 +144,6 @@
             }
         });
     });
-
-    // Function to update the attendance table with new data
-    function updateAttendanceTable() {
-    $.ajax({
-        type: "GET", // Use GET request to fetch data
-        url: "{% url 'view_attendance' %}", // Replace with the URL to fetch attendance details
-        dataType: "json", // Specify that the expected data type is JSON
-        success: function(response) {
-            // Handle success response from the server
-            console.log(response); // Log the response for debugging
-            // Update the attendance table with the received data
-            if (response.attendances.length > 0) {
-                var tableBody = $("#attendanceTable tbody");
-                tableBody.empty(); // Clear existing table rows
-                response.attendances.forEach(function(attendance) {
-                    var row = "<tr>";
-                    row += "<td>" + attendance.user_id + "</td>"; // Change to the appropriate field
-                    row += "<td>" + attendance.created_at + "</td>"; // Change to the appropriate field
-                    row += "<td>" + (attendance.is_present ? "Present" : "Absent") + "</td>"; // Change to the appropriate field
-                    row += "<td>Handle</td>"; // Add appropriate action
-                    row += "</tr>";
-                    tableBody.append(row); // Append the row to the table body
-                });
-            } else {
-                // No attendance data available
-                // Display a message or handle it as needed
-            }
-        },
-        error: function(error) {
-            // Handle error response from the server
-            console.error(error); // Log the error for debugging
-            // Display an error message to the user
-            alert("Error fetching attendance details. Please try again.");
-        }
-    });
-}
 
 
 </script>
