@@ -35,42 +35,198 @@
     
     <!-- Include jQuery and your other JavaScript code -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Your modified JavaScript code
-        $(document).ready(function() {
-            // When the attendanceButton is clicked
-            $("#attendanceButton").on("click", function() {
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        const { latitude, longitude } = position.coords;
-    
-                        // Send geolocation to Django backend via AJAX
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script>
+    $(document).ready(function() {
+        // When the attendanceButton is clicked
+        $("#attendanceButton").on("click", function() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const { latitude, longitude } = position.coords;
+                    console.log("Latitude:", latitude);
+                    console.log("Longitude:", longitude);
+
+                    // Send geolocation to Django backend via AJAX
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'record_attendance' %}", // Replace with your Django endpoint URL
+                        data: { latitude, longitude },
+                        headers: {
+                            'X-CSRFToken': window.csrf_token // Access the CSRF token from the global variable
+                        },
+                        success: function(response) {
+                            // Handle success response from the backend
+                            console.log(response);
+                            alert("Attendance recorded successfully!");
+                        },
+                        error: function(error) {
+                            // Handle error response from the backend
+                            console.error(error);
+                            alert("Error recording attendance. Please try again.");
+                        }
+                    });
+                }, function(error) {
+                    // Error callback for geolocation getCurrentPosition
+                    console.error("Error getting position:", error);
+                    alert("Error getting your location. Please ensure location services are enabled.");
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+                alert("Geolocation is not supported by this browser.");
+            }
+        });
+    });
+</script> -->
+<script>
+    $(document).ready(function() {
+        // Function to calculate the distance between two points (in kilometers)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // Define the four sets of latitude and longitude coordinates
+        
+        //ksr college locations
+
+        // const locations = [
+        //             { latitude: 11.35675, longitude: 77.832722 }, 
+        //             { latitude: 11.354746, longitude: 77.826714 }, 
+        //             { latitude: 11.359947, longitude: 77.823719 },
+        //             { latitude: 11.363630, longitude: 77.826814 }
+        //         ];
+
+        // test locations
+
+        const locations = [
+                    { latitude: 12.712934, longitude: 79.532848 }, 
+                    { latitude: 12.711604, longitude: 79.531850 }, 
+                    { latitude: 12.712012, longitude: 79.530359 },
+                    { latitude: 12.713237, longitude: 79.530488 } 
+                ];
+
+        // When the attendanceButton is clicked
+        $("#attendanceButton").on("click", function() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const { latitude, longitude } = position.coords;
+                    console.log("Latitude:", latitude);
+                    console.log("Longitude:", longitude);
+
+                    // Check if the current location is within any of the specified locations
+                    const perimeterRadius = 5; // Perimeter radius in kilometers
+                    let withinPerimeter = false;
+                    locations.forEach(location => {
+                        const distance = calculateDistance(latitude, longitude, location.latitude, location.longitude);
+                        console.log("Distance to location:", distance);
+                        if (distance <= perimeterRadius) {
+                            withinPerimeter = true;
+                        }
+                    });
+
+                    if (withinPerimeter) {
+                        // Send geolocation to Django backend via AJAX for present records
                         $.ajax({
                             type: "POST",
-                            url: "{% url 'record_attendance' %}", // Replace with your Django endpoint URL
-                            data: { latitude, longitude },
+                            url: "{% url 'record_attendance' %}",
+                            data: { latitude, longitude, withinPerimeter },
                             headers: {
-                                'X-CSRFToken': window.csrf_token // Access the CSRF token from the global variable
+                                'X-CSRFToken': window.csrf_token
                             },
                             success: function(response) {
-                                // Handle success response from the backend
                                 console.log(response);
-                                alert("Attendance recorded successfully!");
+                                alert(response.message);
                             },
                             error: function(error) {
-                                // Handle error response from the backend
                                 console.error(error);
                                 alert("Error recording attendance. Please try again.");
                             }
                         });
-                    });
-                } else {
-                    console.log("Geolocation is not supported by this browser.");
-                    alert("Geolocation is not supported by this browser.");
-                }
-            });
+                    } else {
+                        // Send geolocation to Django backend via AJAX for absent records
+                        $.ajax({
+                            type: "POST",
+                            url: "{% url 'record_attendance' %}",
+                            data: { latitude, longitude, withinPerimeter },
+                            headers: {
+                                'X-CSRFToken': window.csrf_token
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                alert(response.error);
+                            },
+                            error: function(error) {
+                                console.error(error);
+                                alert("Error recording attendance. Please try again.");
+                            }
+                        });
+                        alert("You are not within the permitted perimeter to mark attendance.");
+                    }
+
+                }, function(error) {
+                    // Error callback for geolocation getCurrentPosition
+                    console.error("Error getting position:", error);
+                    alert("Error getting your location. Please ensure location services are enabled.");
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+                alert("Geolocation is not supported by this browser.");
+            }
         });
-    </script>
+    });
+
+    // Function to update the attendance table with new data
+    function updateAttendanceTable() {
+    $.ajax({
+        type: "GET", // Use GET request to fetch data
+        url: "{% url 'view_attendance' %}", // Replace with the URL to fetch attendance details
+        dataType: "json", // Specify that the expected data type is JSON
+        success: function(response) {
+            // Handle success response from the server
+            console.log(response); // Log the response for debugging
+            // Update the attendance table with the received data
+            if (response.attendances.length > 0) {
+                var tableBody = $("#attendanceTable tbody");
+                tableBody.empty(); // Clear existing table rows
+                response.attendances.forEach(function(attendance) {
+                    var row = "<tr>";
+                    row += "<td>" + attendance.user_id + "</td>"; // Change to the appropriate field
+                    row += "<td>" + attendance.created_at + "</td>"; // Change to the appropriate field
+                    row += "<td>" + (attendance.is_present ? "Present" : "Absent") + "</td>"; // Change to the appropriate field
+                    row += "<td>Handle</td>"; // Add appropriate action
+                    row += "</tr>";
+                    tableBody.append(row); // Append the row to the table body
+                });
+            } else {
+                // No attendance data available
+                // Display a message or handle it as needed
+            }
+        },
+        error: function(error) {
+            // Handle error response from the server
+            console.error(error); // Log the error for debugging
+            // Display an error message to the user
+            alert("Error fetching attendance details. Please try again.");
+        }
+    });
+}
+
+
+</script>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

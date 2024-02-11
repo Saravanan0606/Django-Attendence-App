@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 
-from .models import Account, UserProfile
+from .models import Account, UserProfile, Attendance
 # Register your models here.
 
 
@@ -23,5 +23,10 @@ class UserProfileAdmin(admin.ModelAdmin):
     thumbnail.short_description = 'Profile Picture'
     list_display = ('thumbnail', 'user', 'emp_num', 'dept')
 
+class AttendenceAdmin(admin.ModelAdmin):
+    list_display = ['user', 'is_present', 'created_at']
+    list_filter = ['is_present']
+
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Account, AccountAdmin)
+admin.site.register(Attendance, AttendenceAdmin)

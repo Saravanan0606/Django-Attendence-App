@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-
-
 class MyAccountManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
@@ -80,3 +78,13 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.first_name
+    
+class Attendance(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)  # ForeignKey relationship with your custom User model
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
+    is_present = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.created_at}"

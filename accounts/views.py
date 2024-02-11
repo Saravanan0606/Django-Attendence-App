@@ -2,9 +2,11 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
+from django.core.serializers import serialize
 import requests
+from geopy.distance import geodesic
 
-from accounts.models import UserProfile
+from accounts.models import Attendance, UserProfile
 
 # Create your views here.
 
@@ -48,20 +50,31 @@ def dashboard(request):
 @login_required(login_url='login')
 def record_attendance(request):
     if request.method == 'POST':
-        # Get latitude and longitude from POST data
         latitude = request.POST.get('latitude')
         longitude = request.POST.get('longitude')
-
+        within_perimeter = request.POST.get('withinPerimeter')  # Get the withinPerimeter status from the POST data
         print(latitude, longitude)
 
-        # Your logic to check if the location is within the specified area
-        # Perform necessary checks, validations, and record attendance in your database
+        if within_perimeter == 'true':  # Check if withinPerimeter is 'true' (string)
+            # Record attendance if the user is within the permitted perimeter
+            attendance_present = Attendance.objects.create(user=request.user, latitude=latitude, longitude=longitude, is_present=True)
+            attendance_present.save()
+            return JsonResponse({"message": "Attendance recorded successfully!"})  # Wrap the message inside a dictionary
+        else:
+            attendance_absent = Attendance.objects.create(user=request.user, latitude=latitude, longitude=longitude, is_present=False)
+            attendance_absent.save()
+            # Do something else (e.g., display a message, log the event) if the user is not within the permitted perimeter
+            return JsonResponse({"error": "User is not within the attendence perimeter."})  
+    else:
+        return JsonResponse({"error": "Error: POST request required."})  
 
-        # Example response (modify as needed)
-        return JsonResponse({'message': 'Attendance recorded successfully!'})
+@login_required(login_url='login')
+def view_attendance(request):
+    # Fetch attendance data for the logged-in user
+    attendances = Attendance.objects.filter(user=request.user)
+    data = serialize('json', attendances)
 
-    # If request method is not POST or other error handling
-    return JsonResponse({'error': 'Invalid request'})
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url = 'login')
 def logout(request):
