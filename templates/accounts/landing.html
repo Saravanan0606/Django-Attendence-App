@@ -1,12 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="container">
-    <div class="mb-4 mt-5 mx-4 my-5 align-content-center">
-        <button type="button" class="p-2 btn btn-success" id="attendanceButton">Create Attendance</button>
-        <a type="button" class="p-2 btn btn-info" href="{% url 'view_attendence' %}">View Attendance</a>
+    <div class="d-flex justify-content-center my-5">
+        <button type="button" class="btn btn-success" id="attendanceButton">Create Attendance</button>
+    </div>
+
+    <div class="container mt-5 p-3" style="background-color: #3f3f3f;">
+        <table id="attendanceTable" class="table table-sm table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Attendance Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in attendances %}
+                <tr>
+                    <td>{{ emp_num }}</td>
+                    {% if attendance.is_present %}
+                    <td class="text-success font-italic"><b>Present</b></td>
+                    {% else %}
+                    <td class="text-danger font-italic"><b>Absent</b></td>
+                    {% endif %}
+                    <td>{{ attendance.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
-
 {% endblock %}

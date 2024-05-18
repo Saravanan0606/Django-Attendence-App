@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <title>Attendence app</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,17 +15,18 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* Set height for vertical centering */
+            height: 100vh;
+            /* Set height for vertical centering */
         }
-        /* Sample test */
+
         /* Add some space between the buttons */
         .btn-space {
             margin-right: 10px;
         }
-        
     </style>
 </head>
-<body style=" background-image: linear-gradient(to right, #3ab5b0 0%, #3d99be 31%, #56317a 100%); ">
+
+<body style="background-color: #3f3f3f;">
 
     {% include 'navbar.html' %}
 
@@ -34,124 +37,241 @@
     <script>
         window.csrf_token = "{{ csrf_token }}";
     </script>
-    
+
     <!-- Include jQuery and your other JavaScript code -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        // Function to calculate the distance between two points (in kilometers)
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radius of the earth in km
-            const dLat = deg2rad(lat2 - lat1);
-            const dLon = deg2rad(lon2 - lon1);
-            const a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const d = R * c; // Distance in km
-            return d;
-        }
+    <!-- <script>
+        $(document).ready(function () {
+            // Function to calculate the distance between two points (in kilometers)
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Radius of the earth in km
+                const dLat = deg2rad(lat2 - lat1);
+                const dLon = deg2rad(lon2 - lon1);
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const d = R * c; // Distance in km
+                return d;
+            }
 
-        function deg2rad(deg) {
-            return deg * (Math.PI / 180);
-        }
+            function deg2rad(deg) {
+                return deg * (Math.PI / 180);
+            }
 
-        // Define the four sets of latitude and longitude coordinates
-        
-        //ksr college locations
+            // Define the four sets of latitude and longitude coordinates
 
-        const locations = [
-                    { latitude: 11.35675, longitude: 77.832722 }, 
-                    { latitude: 11.354746, longitude: 77.826714 }, 
-                    { latitude: 11.359947, longitude: 77.823719 },
-                    { latitude: 11.363630, longitude: 77.826814 }
-                ];
+            //ksr college locations
 
-        // test locations
+            const locations = [
+                { latitude: 11.35675, longitude: 77.832722 },
+                { latitude: 11.354746, longitude: 77.826714 },
+                { latitude: 11.359947, longitude: 77.823719 },
+                { latitude: 11.363630, longitude: 77.826814 }
+            ];
 
-        // const locations = [
-        //     { latitude: 12.662671, longitude: 79.968669 }, 
-        //     { latitude: 12.660264, longitude: 79.967667 }, 
-        //     { latitude: 12.661518, longitude: 79.964981 },
-        //     { latitude: 12.663624, longitude: 79.966176 } 
-        // ];
+            // test locations
 
-        // When the attendanceButton is clicked
-        $("#attendanceButton").on("click", function() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const { latitude, longitude } = position.coords;
-                    console.log("Latitude:", latitude);
-                    console.log("Longitude:", longitude);
+            // const locations = [
+            //     { latitude: 12.662671, longitude: 79.968669 }, 
+            //     { latitude: 12.660264, longitude: 79.967667 }, 
+            //     { latitude: 12.661518, longitude: 79.964981 },
+            //     { latitude: 12.663624, longitude: 79.966176 } 
+            // ];
 
-                    // Check if the current location is within any of the specified locations
-                    const perimeterRadius = 5; // Perimeter radius in kilometers
-                    let withinPerimeter = false;
-                    locations.forEach(location => {
-                        const distance = calculateDistance(latitude, longitude, location.latitude, location.longitude);
-                        console.log("Distance to location:", distance);
-                        if (distance <= perimeterRadius) {
-                            withinPerimeter = true;
+            // When the attendanceButton is clicked
+            $("#attendanceButton").on("click", function () {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        const { latitude, longitude } = position.coords;
+                        console.log("Latitude:", latitude);
+                        console.log("Longitude:", longitude);
+
+                        // Check if the current location is within any of the specified locations
+                        const perimeterRadius = 5; // Perimeter radius in kilometers
+                        let withinPerimeter = false;
+                        locations.forEach(location => {
+                            const distance = calculateDistance(latitude, longitude, location.latitude, location.longitude);
+                            console.log("Distance to location:", distance);
+                            if (distance <= perimeterRadius) {
+                                withinPerimeter = true;
+                            }
+                        });
+
+                        if (withinPerimeter) {
+                            // Send geolocation to Django backend via AJAX for present records
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url 'landing_page' %}",
+                                data: { latitude, longitude, withinPerimeter },
+                                headers: {
+                                    'X-CSRFToken': window.csrf_token
+                                },
+                                success: function (response) {
+                                    console.log(response);
+                                    alert(response.message);
+                                },
+                                error: function (error) {
+                                    console.error(error);
+                                    alert("Error recording attendance. Please try again.");
+                                }
+                            });
+                        } else {
+                            // Send geolocation to Django backend via AJAX for absent records
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url 'landing_page' %}",
+                                data: { latitude, longitude, withinPerimeter },
+                                headers: {
+                                    'X-CSRFToken': window.csrf_token
+                                },
+                                success: function (response) {
+                                    console.log(response);
+                                    alert(response.error);
+                                },
+                                error: function (error) {
+                                    console.error(error);
+                                    alert("Error recording attendance. Please try again.");
+                                }
+                            });
                         }
+
+                    }, function (error) {
+                        // Error callback for geolocation getCurrentPosition
+                        console.error("Error getting position:", error);
+                        alert("Error getting your location. Please ensure location services are enabled.");
                     });
+                } else {
+                    console.log("Geolocation is not supported by this browser.");
+                    alert("Geolocation is not supported by this browser.");
+                }
+            });
+        });
 
-                    if (withinPerimeter) {
-                        // Send geolocation to Django backend via AJAX for present records
+
+    </script> -->
+
+
+    <script>
+        $(document).ready(function () {
+            // Function to calculate the distance between two points (in kilometers)
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Radius of the earth in km
+                const dLat = deg2rad(lat2 - lat1);
+                const dLon = deg2rad(lon2 - lon1);
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const d = R * c; // Distance in km
+                return d;
+            }
+
+            function deg2rad(deg) {
+                return deg * (Math.PI / 180);
+            }
+
+            // Define the four sets of latitude and longitude coordinates
+            const locations = [
+                { latitude: 11.35675, longitude: 77.832722 },
+                { latitude: 11.354746, longitude: 77.826714 },
+                { latitude: 11.359947, longitude: 77.823719 },
+                { latitude: 11.363630, longitude: 77.826814 }
+            ];
+
+            // When the attendanceButton is clicked
+            $("#attendanceButton").on("click", function () {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        const { latitude, longitude } = position.coords;
+                        console.log("Latitude:", latitude);
+                        console.log("Longitude:", longitude);
+
+                        // Check if the current location is within any of the specified locations
+                        const perimeterRadius = 5; // Perimeter radius in kilometers
+                        let withinPerimeter = false;
+                        locations.forEach(location => {
+                            const distance = calculateDistance(latitude, longitude, location.latitude, location.longitude);
+                            console.log("Distance to location:", distance);
+                            if (distance <= perimeterRadius) {
+                                withinPerimeter = true;
+                            }
+                        });
+
+                        // Send geolocation to Django backend via AJAX
                         $.ajax({
                             type: "POST",
-                            url: "{% url 'record_attendance' %}",
-                            data: { latitude, longitude, withinPerimeter },
+                            url: "{% url 'landing_page' %}",
+                            data: {
+                                latitude: latitude,
+                                longitude: longitude,
+                                withinPerimeter: withinPerimeter
+                            },
                             headers: {
-                                'X-CSRFToken': window.csrf_token
+                                'X-CSRFToken': '{{ csrf_token }}'
                             },
-                            success: function(response) {
+                            success: function (response) {
                                 console.log(response);
-                                alert(response.message);
+                                if (response.error) {
+                                    alert(response.error);
+                                } else {
+                                    alert(response.message);
+                                    updateAttendanceTable();
+                                }
                             },
-                            error: function(error) {
+                            error: function (error) {
                                 console.error(error);
                                 alert("Error recording attendance. Please try again.");
                             }
                         });
-                    } else {
-                        // Send geolocation to Django backend via AJAX for absent records
-                        $.ajax({
-                            type: "POST",
-                            url: "{% url 'record_attendance' %}",
-                            data: { latitude, longitude, withinPerimeter },
-                            headers: {
-                                'X-CSRFToken': window.csrf_token
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                alert(response.error);
-                            },
-                            error: function(error) {
-                                console.error(error);
-                                alert("Error recording attendance. Please try again.");
-                            }
+
+                    }, function (error) {
+                        // Error callback for geolocation getCurrentPosition
+                        console.error("Error getting position:", error);
+                        alert("Error getting your location. Please ensure location services are enabled.");
+                    });
+                } else {
+                    console.log("Geolocation is not supported by this browser.");
+                    alert("Geolocation is not supported by this browser.");
+                }
+            });
+
+            function updateAttendanceTable() {
+                $.ajax({
+                    url: "{% url 'landing_page' %}",
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        var tableBody = $("#attendanceTable tbody");
+                        tableBody.empty();  // Clear existing rows
+
+                        data.attendances.forEach(attendance => {
+                            var row = $("<tr></tr>");
+                            var userCell = $("<td></td>").text("{{ emp_num }}");  // Ensure emp_num is available in the JavaScript context
+                            var statusCell = $("<td></td>")
+                                .text(attendance.is_present ? "Present" : "Absent")
+                                .addClass(attendance.is_present ? "text-success font-italic" : "text-danger font-italic");
+                            var timeCell = $("<td></td>").text(attendance.created_at);
+
+                            row.append(userCell, statusCell, timeCell);
+                            tableBody.append(row);
                         });
+                    },
+                    error: function (error) {
+                        console.error("Error fetching updated attendance data:", error);
                     }
-
-                }, function(error) {
-                    // Error callback for geolocation getCurrentPosition
-                    console.error("Error getting position:", error);
-                    alert("Error getting your location. Please ensure location services are enabled.");
                 });
-            } else {
-                console.log("Geolocation is not supported by this browser.");
-                alert("Geolocation is not supported by this browser.");
             }
         });
-    });
+    </script>
 
 
-</script>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-<!-- Bootstrap Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

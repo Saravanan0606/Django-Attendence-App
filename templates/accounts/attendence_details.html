@@ -16,16 +16,16 @@
             <tr>
                 <td>{{ emp_num }}</td>
                 {% if attendance.is_present %}
-                    <td style="font-style: italic; color: green;"><b>Present</b></td>
+                <td style="font-style: italic; color: green;"><b>Present</b></td>
                 {% else %}
-                    <td style="font-style: italic; color: red;"><b>Absent</b></td>
+                <td style="font-style: italic; color: red;"><b>Absent</b></td>
                 {% endif %}
                 <td>{{ attendance.created_at }}</td>
 
             </tr>
             {% endfor %}
         </tbody>
-    </table>   
+    </table>
 </div>
 
 {% endblock %}
